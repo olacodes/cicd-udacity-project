@@ -4,6 +4,9 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
+      to:
+        default: "no params yet"
+        type: string
       # Add parameter here   
     steps:
       - run:
@@ -16,6 +19,9 @@ commands:
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
+      to:
+        default: "No params yet"
+        type: string
       # Add parameter here     
     steps:
       - run:
@@ -43,8 +49,9 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            # Your code here
-            exit 1
+            cd frontend
+            npm install
+            npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -59,8 +66,9 @@ jobs:
       - run:
           name: Back-end build
           command: |
-             # Your code here
-             exit 1
+            cd backend
+            npm install
+            npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
@@ -68,7 +76,9 @@ jobs:
   test-frontend:
     docker:
       # Docker image here
+      - image: circleci/node:13.8.0
     steps:
+      - checkout
       # Checkout code from git
       # Restore from cache
       # Your job code here
@@ -76,7 +86,9 @@ jobs:
   test-backend:
     docker:
       # Docker image here
+      - image: circleci/node:13.8.0
     steps:
+      - checkout
       # Checkout code from git
       # Restore from cache
       # Your job code here
@@ -84,15 +96,19 @@ jobs:
   scan-frontend:
     docker:
       # Docker image here
+      - image: circleci/node:13.8.0
     steps:
+      - checkout
       # Checkout code from git
       # Restore from cache
       # Your job code here
 
   scan-backend:
     docker:
+      - image: circleci/node:13.8.0
       # Docker image here
     steps:
+      - checkout
       # Checkout code from git
       # Restore from cache
       # Your job code here
@@ -100,8 +116,10 @@ jobs:
   deploy-infrastructure:
     docker:
       # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -134,7 +152,9 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.11
     steps:
+      - checkout
       # Checkout code from git
       # Add ssh keys with fingerprint
       # attach workspace
@@ -153,8 +173,10 @@ jobs:
   run-migrations:
     docker:
       # Docker image here that supports NodeJS
+      - image: circleci/node:13.8.0
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Run migrations
           command: |
@@ -170,8 +192,10 @@ jobs:
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Install dependencies
           command: |
@@ -191,7 +215,10 @@ jobs:
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.11
+
     steps:
+      - checkout
       # Checkout code from git
       # Add ssh keys with fingerprint
       # attach workspace
@@ -208,8 +235,10 @@ jobs:
   smoke-test:
     docker:
       # Lightweight Docker image 
+      - image: alpine:latest
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Install dependencies
           command: |
@@ -231,8 +260,10 @@ jobs:
   cloudfront-update:
     docker:
       # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Install dependencies
           command: |
@@ -246,8 +277,10 @@ jobs:
 cleanup:
     docker:
       # Docker image here
+      - image: alpine:latest
     steps:
       # Checkout code from git
+      - checkout
       - run:
           name: Get old stack workflow id
           command: |
