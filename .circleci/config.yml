@@ -80,14 +80,14 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-        keys:
-          - {{ checksum "frontend-build" }}
-      run:
-        name: Run Frontend Test
-        command: |
-          cd frontend
-          npm install
-          npm run test
+          keys:
+            - frontend-build
+      - run:
+          name: Run Frontend Test
+          command: |
+            cd frontend
+            npm install
+            npm run test
       # Checkout code from git
       # Restore from cache
       # Your job code here
@@ -99,14 +99,14 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-        keys: 
-          - {{ checksum "backend-build"}}
-      run:
-        name: Run Backend Test
-        command: |
-          cd backend
-          npm install
-          npm run test
+          keys:
+            - backend-build
+      - run:
+          name: Run Backend Test
+          command: |
+            cd backend
+            npm install
+            npm run test
       # Checkout code from git
       # Restore from cache
       # Your job code here
