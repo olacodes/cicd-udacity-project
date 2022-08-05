@@ -165,7 +165,6 @@ jobs:
               --tags project=udapeople \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-            exit 1
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -174,17 +173,18 @@ jobs:
               --tags project=udapeople \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
-            exit 1  
       - run:
           name: Add back-end ip to ansible inventory
           command: |
             aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --output text >> ./ansible/inventory.txt
+              --output text >> app/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
+      - destroy-environment
+      when: on_fail
       # Here's where you will add some code to rollback on failure      
 
   configure-infrastructure:
@@ -192,20 +192,28 @@ jobs:
       # Docker image here that supports Ansible
       - image: python:3.7-alpine3.11
     steps:
-      - checkout
       # Checkout code from git
+      - checkout
       # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: ["68:08:b8:3e:91:1f:28:84:4d:f2:5e:95:c2:16:e6:b9"]
+
       # attach workspace
+      - persist_to_workspace:
+          root: /app
+          paths:
+            - ansible/*
+            - files/*
+
       - run:
           name: Install dependencies
           command: |
-            # Your code here
-            exit 1
+            apk add --update ansible
       - run:
           name: Configure server
           command: |
-            # Your code here
-            exit 1
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure      
 
   run-migrations:

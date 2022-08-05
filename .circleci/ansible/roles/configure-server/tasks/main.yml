@@ -1,0 +1,30 @@
+---
+- name: "update apt packages."
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: "upgrade packages"
+  become: yes
+  apt:
+    upgrade: yes
+
+- name: "Install Python"
+  apt:
+    name: "python"
+    state: present
+    update_cache: yes
+
+- name: Install the nodejs
+  apt:
+    name: ["nodejs", "npm"]
+    state: present
+    update_cache: yes
+
+- name: Install the pm2
+  become: yes
+  npm:
+    name: "pm2"
+    global: yes
+    production: yes
+    state: present
