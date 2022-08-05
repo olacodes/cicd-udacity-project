@@ -184,7 +184,7 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
-      when: on_fail
+          when: on_fail
       # Here's where you will add some code to rollback on failure      
 
   configure-infrastructure:
