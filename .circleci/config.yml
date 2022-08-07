@@ -234,18 +234,23 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Run migrations
           command: |
             cd backend
             npm install
-            npm audit fix --audit-level=critical --force
             npm run migrations > migrations_dump.txt
+            cat migrations_dump.txt
       - run:
           name: Send migration results to memstash/kvdb
           command: |
             # Your code here
-            curl https://kvdb.io/5YJ85KwukZEZ3A5EKD7bqM/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+              curl https://kvdb.io/5YJ85KwukZEZ3A5EKD7bqM/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+            fi
       - revert-migrations
      # Here's where you will add some code to rollback on failure      
 
