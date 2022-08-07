@@ -32,11 +32,12 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            SUCCESS=$(curl --insecure https://kvdb.io/5YJ85KwukZEZ3A5EKD7bqM/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            echo "$SUCCESS"
             if(( $SUCCESS==1 )); 
             then
-            #  cd ~/project/backend
-            #  npm install
+            cd ~/project/backend
+            npm install
             #  Add revert code here. You can find this in the Getting Started section.
               exit 1
             fi
@@ -257,17 +258,28 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            yum install python -y
+            yum install node -y
+            yum install ansible -y
+            yum install aws-cli -y
+            yum install npm -y
       - run:
           name: Get backend url
           command: |
-            # your code here
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress')
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
       - run:
           name: Deploy frontend objects
           command: |
+            cd frontend
+            npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             # your code here
+      - destroy-environment
       # Here's where you will add some code to rollback on failure      
 
   deploy-backend:
