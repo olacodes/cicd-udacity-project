@@ -236,13 +236,15 @@ jobs:
       - run:
           name: Run migrations
           command: |
-            # Your code here
-            exit 1
+            cd backend
+            npm install
+            npm run migrations > migrations_dump.txt
       - run:
-          name: Send migration results to memstash
+          name: Send migration results to memstash/kvdb
           command: |
             # Your code here
-            exit 1
+            curl https://kvdb.io/5YJ85KwukZEZ3A5EKD7bqM/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+      - revert-migrations
      # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
@@ -267,7 +269,7 @@ jobs:
           command: |
             # your code here
       # Here's where you will add some code to rollback on failure      
-                    
+
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
