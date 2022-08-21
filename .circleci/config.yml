@@ -307,10 +307,6 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             # your code here
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - ./frontend/dist
       - revert-migrations
       - destroy-environment
       # Here's where you will add some code to rollback on failure      
