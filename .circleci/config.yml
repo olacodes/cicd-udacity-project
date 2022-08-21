@@ -302,6 +302,7 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
+            npm i
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
@@ -328,7 +329,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible openssh-client tar gzip curl
+            apk add --update ansible openssh-client tar gzip curl npm nodejs
             pip install awscli
             # your code here
       - attach_workspace:
