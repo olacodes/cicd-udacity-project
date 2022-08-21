@@ -11,7 +11,7 @@
 
 - name: Extract artifact.tar.gz into the EC2 instance
   unarchive:  
-    src: artifact.tar.gz  
+    src: /root/project/backend.tar.gz  
     dest: /backend
 
 - name: Executing Node
