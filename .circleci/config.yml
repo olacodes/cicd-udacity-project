@@ -285,7 +285,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum install -y tar gzip curl nodejs npm ansible python
+            yum install -y tar gzip curl ansible
+            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
+            yum install -y nodejs
       - attach_workspace:
           at: ~/
       - run:
@@ -326,7 +328,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible openssh-client tar gzip curl nodejs npm
+            apk add --update ansible openssh-client tar gzip curl
             pip install awscli
             # your code here
       - attach_workspace:
