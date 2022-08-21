@@ -5,16 +5,16 @@ commands:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       to:
-        default: "no params yet"
         type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
       # Add parameter here   
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.to >>
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.to >>
             # Your code here
             # exit 1
 
@@ -205,7 +205,7 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
-      - image: python:3.7-alpine3.11
+      - image: ansible:latest
     steps:
       # Checkout code from git
       - checkout
@@ -217,12 +217,11 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/.circleci/ansible
-            - project/.circleci/files
+            - project
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
+            yum install tar gzip ansible awscli
       - run:
           name: Configure server
           command: |
@@ -299,7 +298,7 @@ jobs:
   deploy-backend:
     docker:
       # Docker image here that supports Ansible
-      - image: python:3.7-alpine3.11
+      - image: ansible:latest
 
     steps:
       - checkout

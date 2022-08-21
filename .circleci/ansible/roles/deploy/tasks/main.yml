@@ -9,7 +9,7 @@
   apt:
     upgrade: yes
 
-- name: Extract artifact.tar.gz into  
+- name: Extract artifact.tar.gz into the EC2 instance
   unarchive:  
     src: artifact.tar.gz  
     dest: /backend
