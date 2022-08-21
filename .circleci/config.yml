@@ -282,12 +282,12 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - attach_workspace:
-          at: .
       - run:
           name: Install dependencies
           command: |
             yum install -y tar gzip curl nodejs ansible python
+      - attach_workspace:
+          at: ~/
       - run:
           name: Get backend url
           command: |
@@ -304,6 +304,11 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             # your code here
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - ./frontend/dist
+      - revert-migrations
       - destroy-environment
       # Here's where you will add some code to rollback on failure      
 
@@ -318,14 +323,14 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["68:08:b8:3e:91:1f:28:84:4d:f2:5e:95:c2:16:e6:b9"]
       # attach workspace
-      - attach_workspace:
-          at: ~/
       - run:
           name: Install dependencies
           command: |
             apk add --update ansible openssh-client tar gzip curl nodejs npm
             pip install awscli
             # your code here
+      - attach_workspace:
+          at: ~/
       - run:
           name: Deploy backend
           command: |
@@ -340,6 +345,7 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       # Here's where you will add some code to rollback on failure  
+      - revert-migrations
       - destroy-environment
 
   smoke-test:
