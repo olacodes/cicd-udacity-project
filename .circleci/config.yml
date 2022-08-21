@@ -285,7 +285,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum install -y tar gzip curl nodejs ansible python
+            yum install -y tar gzip curl nodejs npm ansible python
       - attach_workspace:
           at: ~/
       - run:
