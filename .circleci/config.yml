@@ -283,17 +283,11 @@ jobs:
       # Checkout code from git
       - checkout
       - attach_workspace:
-          at: ~/
+          at: .
       - run:
           name: Install dependencies
           command: |
-            yum install python -y
-            yum install nodejs -y
-            yum install ansible -y
-            yum install aws-cli -y
-            yum install npm -y
-            yum install tar -y
-            yum install gzip -y
+            yum install -y tar gzip curl nodejs ansible python
       - run:
           name: Get backend url
           command: |
