@@ -10,10 +10,14 @@ commands:
       # Add parameter here   
     steps:
       - run:
-          name: Destroy environments
+          name: Destroy back-end environments
           when: on_fail
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.to >>
+      - run:
+          name: Destroy front-end environments
+          when: on_fail
+          command: |
             aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.to >>
             # Your code here
             # exit 1
@@ -205,7 +209,7 @@ jobs:
   configure-infrastructure:
     docker:
       # Docker image here that supports Ansible
-      - image: ansible:latest
+      - image: python:3.7-alpine3.11
     steps:
       # Checkout code from git
       - checkout
@@ -214,14 +218,14 @@ jobs:
           fingerprints: ["68:08:b8:3e:91:1f:28:84:4d:f2:5e:95:c2:16:e6:b9"]
 
       # attach workspace
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
-            yum install tar gzip ansible awscli
+            apk add --update ansible openssh-client tar gzip curl nodejs npm
+            pip install awscli
+            cat .circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
@@ -307,6 +311,8 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["68:08:b8:3e:91:1f:28:84:4d:f2:5e:95:c2:16:e6:b9"]
       # attach workspace
+      attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
